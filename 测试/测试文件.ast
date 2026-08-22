@@ -1,78 +1,52 @@
-{
-  "类型": "程序",
-  "行号": 1,
-  "列号": 1,
-  "子节点": [
-    {
-      "类型": "定义语句",
-      "变量名": "文本",
-      "行号": 1,
-      "列号": 1,
-      "子节点": [
-        {
-          "类型": "字符串字面量",
-          "值": "\"",
-          "行号": 1,
-          "列号": 14
-        }
-      ],
-      "变量类型": "名称",
-      "值": {
-        "类型": "字符串字面量",
-        "值": "\"",
-        "行号": 1,
-        "列号": 14
-      }
-    },
-    {
-      "类型": "函数调用",
-      "函数名": "输出",
-      "函数类型": "内置函数",
-      "参数": {
-        "类型": "变量引用",
-        "变量名": "名称",
-        "行号": 2,
-        "列号": 6
-      },
-      "行号": 2,
-      "列号": 1,
-      "子节点": [
-        {
-          "类型": "变量引用",
-          "变量名": "名称",
-          "行号": 2,
-          "列号": 6
-        }
-      ]
-    },
-    {
-      "类型": "函数定义",
-      "函数名": "测试函数",
-      "参数": [],
-      "行号": 3,
-      "列号": 1,
-      "子节点": []
-    },
-    {
-      "类型": "函数调用",
-      "函数名": "输出",
-      "函数类型": "内置函数",
-      "参数": {
-        "类型": "字符串字面量",
-        "值": "\"",
-        "行号": 4,
-        "列号": 6
-      },
-      "行号": 4,
-      "列号": 1,
-      "子节点": [
-        {
-          "类型": "字符串字面量",
-          "值": "\"",
-          "行号": 4,
-          "列号": 6
-        }
-      ]
-    }
-  ]
-}
+Module(
+    body=[
+        Assign(
+            targets=[
+                Name(id='测试', ctx=Store())],
+            value=Constant(value='一串文本')),
+        Assign(
+            targets=[
+                Name(id='名称', ctx=Store())],
+            value=Constant(value='测试内容')),
+        Assign(
+            targets=[
+                Name(id='名称', ctx=Store())],
+            value=Constant(value='测试内容')),
+        FunctionDef(
+            name='函数名称',
+            args=arguments(
+                args=[
+                    arg(
+                        arg='参数1',
+                        annotation=Name(id='str', ctx=Load())),
+                    arg(
+                        arg='参数2',
+                        annotation=Name(id='int', ctx=Load()))]),
+            body=[
+                Assign(
+                    targets=[
+                        Name(id='测试名称', ctx=Store())],
+                    value=Constant(value='12')),
+                FunctionDef(
+                    name='函数名',
+                    args=arguments(
+                        args=[
+                            arg(
+                                arg='特别参数',
+                                annotation=Name(id='int', ctx=Load()))]),
+                    body=[
+                        Expr(
+                            value=Call(
+                                func=Name(id='print', ctx=Load()),
+                                args=[
+                                    Constant(value='测试')]))]),
+                Expr(
+                    value=Call(
+                        func=Name(id='print', ctx=Load()),
+                        args=[
+                            Name(id='测试名称', ctx=Load())]))]),
+        Expr(
+            value=Call(
+                func=Name(id='print', ctx=Load()),
+                args=[
+                    Name(id='测试', ctx=Load())]))])

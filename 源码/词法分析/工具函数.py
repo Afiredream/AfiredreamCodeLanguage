@@ -1,17 +1,17 @@
 import re
 from 词法规则 import 关键字词, 运算符号, 函数名称
 
+def 过滤空白元素(数组):
+
+
+def 遍历一维数组(数组, 函数):
+    return [函数(元素) for 元素 in 数组]
+
+def 空格分割文本(文本):
+    数组 = 文本.splitlines()
+    数组 = 遍历一维数组(数组, )
+
 def 按照换行空格解析文本(text):
-    """
-    将输入字符串按换行分割为数组，去除空行，
-    再按空格分割为二维数组，保留空元素
-    
-    参数:
-        text: 输入的字符串
-        
-    返回:
-        二维数组，每个元素是分割后的单词列表（可能包含空字符串）
-    """
     # 第一步：按换行分割，去除空行
     lines = text.splitlines()  # splitlines() 会自动处理各种换行符
     lines = [line for line in lines if line.strip() != '']  # 去除空行或只有空格的行
