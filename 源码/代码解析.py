@@ -1,78 +1,24 @@
 #!/bin/env python3
+import os
 import ast
 import json
+from pathlib import Path
 from lark import Lark, Transformer, Token, Tree
 from 通用函数 import 读取文本文件, 覆写对象文件, 覆写文本文件
 
 代码文本 = 读取文本文件("/home/usr/燃梦中文语言/测试/测试文件")
 
+源码目录 = Path(__file__).parent
 
-语法规则 = r'''
+语法文件 = os.path.join(源码目录, '语法规则.lark')
+语法文本 = 读取文本文件(语法文件)
 
-  %import common.WS
-  %ignore WS
 
-  start: statement+
-  statement:define_type
-          | define_capacity
-          | define_function
-          | define_variable
-          | define_constant
-          | define_property
-          | define_structure
-          | quote_value
-          | quote_function
-          | access_pipe
-          | access_object
-          | control_loop
-          | control_select
-
-  quote_value: name
-  quote_function:   name "(" arguments ")"
-
-  access_object: name ("." name)*
-  access_pipe: quote_value ("|" quote_function)*
-
-  define_type:     "类型" type ":" name "=" value
-  define_constant: "常量" type ":" name "=" value
-  define_variable: "变量" type ":" name "=" value
-  define_capacity: "容量" type ":" name "=" value
-  define_property: "属性" type ":" name "=" value
-
-  define_function: "函数" type ":" name "(" param ")" "{" start "}"
-  define_structure:"结构" type ":" name "(" param ")" "{" start "}"
-
-  control_loop: "循环" "("  ")" "{" start "}"
-  control_select: "如果" "(" ")" "{" start "}" 
-  control_switch: "匹配" "(" ")" "{" start "}" 
-
-  arguments: (value ("," value)*)?
-  param: (type ":" name ("," type ":" name)*)?
-  type: name
-  name: /[a-zA-Z0-9_\u4e00-\u9fa5]+/
-  value: string | number | bool | list | name | quote_function | quote_value
-  string: /"[^"]*"/
-  bool: "真" | "假"
-  number: /[0-9]+/
-  list: "[" (value ("," value)*)? "]"
-  
-  function_terminal:"输入" 
-                  | "输出"
-  function_string:"文本长度" 
-                | "文本索引" 
-                | "文本拼接" 
-                | "文本提取" 
-                | "文本分割" 
-                | "文本匹配"
-
-'''
-
-代码工具 = Lark(语法规则, parser='lalr') 
-
+代码工具 = Lark(语法文本, parser='lalr') 
 代码结构 = 代码工具.parse(代码文本)
 
 
-# print(代码结构)
+print(代码结构)
 
 
 class 代码转换(Transformer):

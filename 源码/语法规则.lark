@@ -1,0 +1,64 @@
+%import common.WS // 空白符 " " "\n" "\t"
+%import common.NEWLINE // 换行符 "\n" "\r\n"
+%import common.WHITESPACE // 空白符 " " "\n"
+%import common.INT // 自然数
+%import common.SIGNED_INT //整数 
+%import common.DECIMAL //小数
+%import common.FLOAT //浮点数
+%import common.NUMBER //数字
+%import common.SIGNED_NUMBER //符号数字
+%import common.STRING //双引号字符串
+%import common.ESCAPED_STRING
+%import common.LSTRING //单引号字符串
+%import common.CSTRING //C风格字符串
+%import common.ID //标识
+%import common.WORD //多个字母
+%import common.LETTER //任意英文字母
+%import common.LCASE_LETTER //小写英文字母
+%import common.UCASE_LETTER //大写英文字母
+%import common.DIGIT //数字
+%import common.HEXDIGIT //十六进制数字
+%import common.SH_COMMENT //#
+%import common.CPP_COMMENT ////
+%import common.C_COMMENT // /**/
+%import common.SQL_COMMENT //--
+%import common.ALPHANUM
+%ignore WS
+
+start: statement+
+statement: function
+         | define_type
+         | define_capacity
+         | define_function
+         | define_variable
+         | define_constant
+         | define_property
+         | define_structure
+         | access_pipe
+         | access_object
+         | control_loop
+         | control_select
+
+define_type:     "类型" name ":" name "=" value
+define_constant: "常量" name ":" name "=" value
+define_variable: "变量" name ":" name "=" value
+define_capacity: "容量" name ":" name "=" value
+define_property: "属性" name ":" name "=" value
+
+define_function: "函数" name ":" name "(" param ")" "{" start "}"
+define_structure:"结构" name ":" name "(" param ")" "{" start "}"
+
+control_loop:   "循环" "(" name ")" "{" start "}"
+control_select: "如果" "(" name ")" "{" start "}" 
+
+access_object: name ("." name)*
+access_pipe: ( name | function) ("|" function)*
+
+
+arguments: (value ("," value)*)?
+param: (name ":" name ("," name ":" name)*)?
+name: /[a-zA-Z0-9_\u4e00-\u9fa5]+/
+value: ESCAPED_STRING | LSTRING | NUMBER | bool | list | name | function
+bool: "真" | "假"
+list: "[" (value ("," value)*)? "]"
+function:   name "(" arguments ")"
