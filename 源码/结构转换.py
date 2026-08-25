@@ -1,20 +1,3 @@
-#!/bin/env python3
-import os
-import ast
-import json
-from 通用函数 import 读取文本文件, 覆写对象文件, 覆写文本文件
-from 词法分析 import 中文代码分析
-from 语法分析 import 树状结构分析
-from 结构转换 import 对象结构转换
-
-代码文本 = 读取文本文件("/home/usr/燃梦中文语言/测试/测试文件")
-
-树状结构 = 中文代码分析(代码文本)
-# print(树状结构)
-对象结构 = 树状结构分析(树状结构)
-print(对象结构)
-
-覆写对象文件("/home/usr/燃梦中文语言/测试/测试文件.json", 对象结构)
 
 class 语法对象转换:
 
@@ -199,12 +182,3 @@ class 语法对象转换:
 
 转化工具 = 语法对象转换()
 语言对象 =  转化工具.转换对象(最终代码)
-
-
-覆写文本文件("/home/usr/燃梦中文语言/测试/测试文件.ast", ast.dump(语言对象, indent=4))
-代码文本 = ast.unparse(语言对象)
-print(语言对象)
-print(ast.unparse(语言对象))
-
-
-覆写文本文件("/home/usr/燃梦中文语言/测试/测试文件.py", 代码文本)
