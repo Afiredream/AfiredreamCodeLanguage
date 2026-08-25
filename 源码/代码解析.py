@@ -18,63 +18,61 @@ from 通用函数 import 读取文本文件, 覆写对象文件, 覆写文本文
 代码结构 = 代码工具.parse(代码文本)
 
 
-print(代码结构)
+# print(代码结构)
 
 
 class 代码转换(Transformer):
 
     def start(自己, 项目):
         return {"类型": "代码", "代码": 项目}
-
     def statement(自己, 项目):
         return 项目[0] if 项目 else None
 
-    def function_block(自己, 项目):
-      return 项目
-
-    def structure_block(自己, 项目):
-      return 项目
-    
+    def 量值定义(自己, 项目, 语义):
+        return {
+            "语义": 语义,
+            "类型": 自己.提取数值(项目[0]),
+            "名称": 自己.提取数值(项目[1]),
+            "数值": 自己.提取数值(项目[2]),
+        }
     def define_constant(自己, 项目):
-        return {
-            "语义": "定义常量",
-            "类型": 自己.提取数值(项目[0]),
-            "名称": 自己.提取数值(项目[1]),
-            "数值": 自己.提取数值(项目[2])
-        }
-    
+        return 自己.量值定义(项目, "定义常量")
     def define_variable(自己, 项目):
-        return {
-            "语义": "定义变量",
-            "类型": 自己.提取数值(项目[0]),
-            "名称": 自己.提取数值(项目[1]),
-            "数值": 自己.提取数值(项目[2])
-        }
-    
+        return 自己.量值定义(项目, "定义变量")
     def define_capacity(自己, 项目):
+        return 自己.量值定义(项目, "定义容量")
+    def define_type(自己, 项目):
+        return 自己.量值定义(项目, "定义类型")
+    def define_property(自己, 项目):
+        return 自己.量值定义(项目, "定义属性")
+
+    def 结构定义(自己, 项目, 语义):
         return {
-            "语义": "定义容量",
-            "类型": 自己.提取数值(项目[0]),
-            "名称": 自己.提取数值(项目[1]),
-            "数值": 自己.提取数值(项目[2])
-        }
-    
-    def define_function(自己, 项目):
-        return {
-            "语义": "定义函数",
+            "语义": 语义,
             "返回": 自己.提取数值(项目[0]),
             "名称": 自己.提取数值(项目[1]),
             "参数": 项目[2],
             "代码": 项目[3]
         }
-    
-    def quote_function(自己, 项目):
+    def define_function(自己, 项目):
+        return 自己.结构定义(项目, "定义函数")
+    def define_structure(自己, 项目):
+        return 自己.结构定义(项目, "定义结构")
+
+    def access_pipe(自己, 项目):
+        return {
+            "语义": "访问管道",
+            "名称": 自己.提取数值(项目[0]),
+            "属性": [自己.提取数值(项目[i]) for i in range(1, len(项目), 2)]
+        }
+
+    def function(自己, 项目):
         return {
             "语义": "调用函数",
             "名称": 自己.提取数值(项目[0]),
             "参数": 自己.提取数值(项目[1])
         }
-    
+
     def type(自己, 项目):
         return 项目[0] if 项目 else None
     
@@ -92,7 +90,7 @@ class 代码转换(Transformer):
         else:
           return None
     
-    def param(自己, 项目):
+    def params(自己, 项目):
         params = []
         for i in range(0, len(项目), 2):
             if i+1 < len(项目):
@@ -156,7 +154,6 @@ class 语法对象转换:
         return 节点列表
 
     def 转换节点(self, 节点):
-            print(节点)
             语义 = 节点["语义"]
             if 语义 == "定义常量":
                 return self.转换变量(节点)
@@ -168,8 +165,8 @@ class 语法对象转换:
                 return self.转换函数(节点)
             elif 语义 == "调用函数":
                 return self.转换调用(节点)
-            # else:
-            #     return None
+            else:
+                print(节点)
     
     def 转换变量(self, 节点):
 

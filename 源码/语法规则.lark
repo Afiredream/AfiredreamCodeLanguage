@@ -1,32 +1,8 @@
-%import common.WS // 空白符 " " "\n" "\t"
-%import common.NEWLINE // 换行符 "\n" "\r\n"
-%import common.WHITESPACE // 空白符 " " "\n"
-%import common.INT // 自然数
-%import common.SIGNED_INT //整数 
-%import common.DECIMAL //小数
-%import common.FLOAT //浮点数
-%import common.NUMBER //数字
-%import common.SIGNED_NUMBER //符号数字
-%import common.STRING //双引号字符串
-%import common.ESCAPED_STRING
-%import common.LSTRING //单引号字符串
-%import common.CSTRING //C风格字符串
-%import common.ID //标识
-%import common.WORD //多个字母
-%import common.LETTER //任意英文字母
-%import common.LCASE_LETTER //小写英文字母
-%import common.UCASE_LETTER //大写英文字母
-%import common.DIGIT //数字
-%import common.HEXDIGIT //十六进制数字
-%import common.SH_COMMENT //#
-%import common.CPP_COMMENT ////
-%import common.C_COMMENT // /**/
-%import common.SQL_COMMENT //--
-%import common.ALPHANUM
+%import common.WS
 %ignore WS
 
 start: statement+
-statement: function
+statement: value
          | define_type
          | define_capacity
          | define_function
@@ -36,29 +12,62 @@ statement: function
          | define_structure
          | access_pipe
          | access_object
+         | access_optional
          | control_loop
          | control_select
 
-define_type:     "类型" name ":" name "=" value
-define_constant: "常量" name ":" name "=" value
-define_variable: "变量" name ":" name "=" value
-define_capacity: "容量" name ":" name "=" value
-define_property: "属性" name ":" name "=" value
+define_type:     "类型" type ":" name "=" value
+define_constant: "常量" type ":" name "=" value
+define_variable: "变量" type ":" name "=" value
+define_capacity: "容量" type ":" name "=" value
+define_property: "属性" type ":" name "=" value
 
-define_function: "函数" name ":" name "(" param ")" "{" start "}"
-define_structure:"结构" name ":" name "(" param ")" "{" start "}"
+define_function:  "函数" type ":" name "(" params ")" "{" start "}"
+define_structure: "结构" type ":" name "(" params ")" "{" start "}"
 
 control_loop:   "循环" "(" name ")" "{" start "}"
 control_select: "如果" "(" name ")" "{" start "}" 
 
-access_object: name ("." name)*
-access_pipe: ( name | function) ("|" function)*
-
+access_pipe:     value ("|" function)+
+access_object:   value ("." name)+
+access_optional: value ("?" name)+
 
 arguments: (value ("," value)*)?
-param: (name ":" name ("," name ":" name)*)?
-name: /[a-zA-Z0-9_\u4e00-\u9fa5]+/
-value: ESCAPED_STRING | LSTRING | NUMBER | bool | list | name | function
-bool: "真" | "假"
-list: "[" (value ("," value)*)? "]"
+params: (type ":" name ("," type ":" name)*)?
+value: string | number | bool | list | object | name | function
 function:   name "(" arguments ")"
+
+// 常量
+
+  // 数字类型
+  number: real | percentage | permille | permyriad
+
+  sign: /[+-]/
+  natural: /[0-9]+/
+  integer: sign? natural
+  decimal: sign? natural "." natural
+  fraction: integer "/" natural
+  real: integer | decimal | fraction
+
+  percentage: real "%"
+  permille: real "‰"
+  permyriad: real "‱"
+
+  // 文本类型
+  string: /"[^"]*"/ | /'[^']*'/
+
+  // 状态类型
+  bool: "真" | "假"
+
+// 变量
+
+  type: name
+  name: /[a-zA-Z0-9_\u4e00-\u9fff\u3400-\u4DBF]+/
+
+// 容量
+
+  // 列表类型
+  list: "[" (value ("," value)*)? "]"
+  object: "{" (pair ("," pair)*)? "}"
+  pair: key ":" value
+  key: name | string | integer
