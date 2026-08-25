@@ -4,7 +4,7 @@ from lark import Transformer, Tree, Token
 class 语法分析(Transformer):
 
     def start(自己, 项目):
-        return {"类型": "代码", "代码": 项目}
+        return 项目
     def statement(自己, 项目):
         return 项目[0] if 项目 else None
 

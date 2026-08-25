@@ -1,0 +1,62 @@
+Module(
+  body=[
+    Assign(
+      targets=[
+        Name(id='测试', ctx=Store())],
+      value=Constant(value='一串文本')),
+    Assign(
+      targets=[
+        Name(id='名称', ctx=Store())],
+      value=Constant(value='测试内容')),
+    Assign(
+      targets=[
+        Name(id='名称', ctx=Store())],
+      value=Constant(value='测试内容')),
+    FunctionDef(
+      name='函数名称',
+      args=arguments(
+        args=[
+          arg(
+            arg='参数1',
+            annotation=Name(id='str', ctx=Load())),
+          arg(
+            arg='参数2',
+            annotation=Name(id='int', ctx=Load()))]),
+      body=[
+        Assign(
+          targets=[
+            Name(id='测试名称', ctx=Store())],
+          value=Constant(value='12')),
+        FunctionDef(
+          name='函数名',
+          args=arguments(
+            args=[
+              arg(
+                arg='特别参数',
+                annotation=Name(id='int', ctx=Load()))]),
+          body=[
+            Expr(
+              value=Call(
+                func=Name(id='print', ctx=Load()),
+                args=[
+                  Constant(value='测试')]))]),
+        Expr(
+          value=Call(
+            func=Name(id='print', ctx=Load()),
+            args=[
+              Name(id='测试名称', ctx=Load())]))]),
+    Expr(
+      value=Call(
+        func=Name(id='print', ctx=Load()),
+        args=[
+          Name(id='测试', ctx=Load())])),
+    Expr(
+      value=Call(
+        func=Name(id='错误', ctx=Load()),
+        args=[
+          Constant(value='测试错误')])),
+    Expr(
+      value=Call(
+        func=Name(id='调试', ctx=Load()),
+        args=[
+          Constant(value='测试调试')]))])

@@ -395,3 +395,16 @@ def 路径解析(path: str) -> dict:
         '修改时间': datetime.fromtimestamp(p.stat().st_mtime).strftime("%Y-%m-%d %H:%M:%S") if p.exists() else None,
     }
 
+测试 = '一串文本'
+名称 = '测试内容'
+名称 = '测试内容'
+
+def 函数名称(参数1: str, 参数2: int):
+    测试名称 = '12'
+
+    def 函数名(特别参数: int):
+        print('测试')
+    print(测试名称)
+print(测试)
+错误('测试错误')
+调试('测试调试')
