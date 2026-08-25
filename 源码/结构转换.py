@@ -1,5 +1,7 @@
 
-class 语法对象转换:
+import ast
+
+class 结构转换:
 
     def __init__(self):
         self.变量列表 = {} 
@@ -17,18 +19,19 @@ class 语法对象转换:
             if 节点: 节点列表.append(节点)
         return 节点列表
 
-    def 转换节点(self, 节点):
+    def 转换节点(自己, 节点):
+            print(节点)
             语义 = 节点["语义"]
             if 语义 == "定义常量":
-                return self.转换变量(节点)
+                return 自己.转换变量(节点)
             elif 语义 == "定义变量":
-                return self.转换变量(节点)
+                return 自己.转换变量(节点)
             elif 语义 == "定义容量":
-                return self.转换变量(节点)
+                return 自己.转换变量(节点)
             elif 语义 == "定义函数":
-                return self.转换函数(节点)
+                return 自己.转换函数(节点)
             elif 语义 == "调用函数":
-                return self.转换调用(节点)
+                return 自己.转换调用(节点)
             else:
                 print(节点)
     
@@ -180,5 +183,8 @@ class 语法对象转换:
         return 类型映射表.get(类型名, "Any")
     
 
-转化工具 = 语法对象转换()
-语言对象 =  转化工具.转换对象(最终代码)
+代码工具 = 结构转换()
+
+def 对象结构转换(对象结构):
+  return 代码工具.转换对象(对象结构)
+
