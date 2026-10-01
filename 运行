@@ -1,3 +1,4 @@
-#!/bin/sh
-Root="$(dirname "$0")"
-exec "$Root/源码/运行代码" "$@"
+#!/bin/env bash
+ROOT="$(dirname "$0")"
+source "$ROOT/环境/bin/activate"
+exec "$ROOT/源码/运行软件.py" "$@"

@@ -1,19 +1,20 @@
 
-from lark import Transformer, Tree, Token
+from lark import Transformer, Token, Tree
 
 class 语法分析(Transformer):
 
     def start(自己, 项目):
         return 项目
+
     def statement(自己, 项目):
         return 项目[0] if 项目 else None
 
     def 量值定义(自己, 项目, 语义):
         return {
-            "语义": 语义,
+            "语句": 语义,
             "类型": 自己.提取数值(项目[0]),
             "名称": 自己.提取数值(项目[1]),
-            "数值": 自己.提取数值(项目[2]),
+            "量值": 自己.提取数值(项目[2]),
         }
     def define_constant(自己, 项目):
         return 自己.量值定义(项目, "定义常量")
@@ -28,7 +29,7 @@ class 语法分析(Transformer):
 
     def 结构定义(自己, 项目, 语义):
         return {
-            "语义": 语义,
+            "语句": 语义,
             "返回": 自己.提取数值(项目[0]),
             "名称": 自己.提取数值(项目[1]),
             "参数": 项目[2],
@@ -41,14 +42,14 @@ class 语法分析(Transformer):
 
     def access_pipe(自己, 项目):
         return {
-            "语义": "访问管道",
+            "语句": "访问管道",
             "名称": 自己.提取数值(项目[0]),
             "属性": [自己.提取数值(项目[i]) for i in range(1, len(项目), 2)]
         }
 
     def function(自己, 项目):
         return {
-            "语义": "调用函数",
+            "语句": "结构调用",
             "名称": 自己.提取数值(项目[0]),
             "参数": 自己.提取数值(项目[1])
         }
@@ -108,7 +109,6 @@ class 语法分析(Transformer):
             return [self.提取数值(child) for child in node.children if child]
         return []
 
-代码工具 = 语法分析()
-
-def 树状结构分析(树状结构):
-  return 代码工具.transform(树状结构)
+分析工具 = 语法分析()
+def 语言语法分析(词元列表):
+  return 分析工具.transform(词元列表)
