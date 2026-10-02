@@ -17,7 +17,7 @@ statement: define_quote
          | control_loop
          | control_select
          | module_import
-         | module_outport
+         | module_export
 
 define_quote: name
 define_type:     "类型" type ":" name "=" data
@@ -37,10 +37,10 @@ access_object: value ("." name)+
 access_pipe: value ("|" struct_quote)+
 
 module_import: "导入" name
-module_outport: "导出" name
+module_export: "导出" name
 
 data: value | struct_quote | define_quote
-argument: data
+argument: value | struct_quote | define_quote
 arguments: (argument ("," argument)*)?
 param: type ":" name
 params: (param ("," param)*)?
@@ -71,7 +71,7 @@ value: string | number | bool | list | object
 // 变量
 
   type: name
-name: /[a-zA-Z_\u4e00-\u9fff\u3400-\u4DBF][a-zA-Z0-9_\u4e00-\u9fff\u3400-\u4DBF]*/
+  name: /[a-zA-Z_\u4e00-\u9fff\u3400-\u4DBF][a-zA-Z0-9_\u4e00-\u9fff\u3400-\u4DBF]*/
 
 // 容量
 
