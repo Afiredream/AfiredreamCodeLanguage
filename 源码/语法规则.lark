@@ -1,41 +1,50 @@
 %import common.WS
 %ignore WS
 
-start: statement+
-statement: value
+start: statements
+statements: statement+
+statement: define_quote
          | define_type
          | define_capacity
-         | define_function
          | define_variable
          | define_constant
-         | define_property
-         | define_structure
+         | struct_quote
+         | struct_class
+         | struct_function
          | access_pipe
          | access_object
-         | access_optional
+         | access_option
          | control_loop
          | control_select
+         | module_import
+         | module_outport
 
-define_type:     "类型" type ":" name "=" value
-define_constant: "常量" type ":" name "=" value
-define_variable: "变量" type ":" name "=" value
-define_capacity: "容量" type ":" name "=" value
-define_property: "属性" type ":" name "=" value
+define_quote: name
+define_type:     "类型" type ":" name "=" data
+define_constant: "常量" type ":" name "=" data
+define_variable: "变量" type ":" name "=" data
+define_capacity: "容量" type ":" name "=" data
 
-define_function:  "函数" type ":" name "(" params ")" "{" start "}"
-define_structure: "结构" type ":" name "(" params ")" "{" start "}"
+struct_quote: name "(" arguments ")"
+struct_class: "模型" type ":" name "(" params ")" "{" statements "}"
+struct_function:  "函数" type ":" name "(" params ")" "{" statements "}"
 
-control_loop:   "循环" "(" name ")" "{" start "}"
-control_select: "如果" "(" name ")" "{" start "}" 
+control_loop:   "循环" "(" name ")" "{" statements "}"
+control_select: "如果" "(" name ")" "{" statements "}" "或者" "(" name ")" "{" statements "}" 
 
-access_pipe:     value ("|" function)+
-access_object:   value ("." name)+
-access_optional: value ("?" name)+
+access_option: value ("?" name)+
+access_object: value ("." name)+
+access_pipe: value ("|" struct_quote)+
 
-arguments: (value ("," value)*)?
-params: (type ":" name ("," type ":" name)*)?
-value: string | number | bool | list | object | name | function
-function:   name "(" arguments ")"
+module_import: "导入" name
+module_outport: "导出" name
+
+data: value | struct_quote | define_quote
+argument: data
+arguments: (argument ("," argument)*)?
+param: type ":" name
+params: (param ("," param)*)?
+value: string | number | bool | list | object
 
 // 常量
 
@@ -62,7 +71,7 @@ function:   name "(" arguments ")"
 // 变量
 
   type: name
-  name: /[a-zA-Z0-9_\u4e00-\u9fff\u3400-\u4DBF]+/
+name: /[a-zA-Z_\u4e00-\u9fff\u3400-\u4DBF][a-zA-Z0-9_\u4e00-\u9fff\u3400-\u4DBF]*/
 
 // 容量
 

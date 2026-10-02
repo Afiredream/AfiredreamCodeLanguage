@@ -4,41 +4,61 @@ from lark import Transformer, Token, Tree
 class 语法分析(Transformer):
 
     def start(自己, 项目):
+        return 项目[0]
+
+    def statements(自己, 项目):
         return 项目
 
     def statement(自己, 项目):
         return 项目[0] if 项目 else None
 
-    def 量值定义(自己, 项目, 语义):
+    def 定义语法(自己, 项目, 语句):
         return {
-            "语句": 语义,
+            "语句": 语句,
             "类型": 自己.提取数值(项目[0]),
             "名称": 自己.提取数值(项目[1]),
             "量值": 自己.提取数值(项目[2]),
         }
-    def define_constant(自己, 项目):
-        return 自己.量值定义(项目, "定义常量")
-    def define_variable(自己, 项目):
-        return 自己.量值定义(项目, "定义变量")
-    def define_capacity(自己, 项目):
-        return 自己.量值定义(项目, "定义容量")
-    def define_type(自己, 项目):
-        return 自己.量值定义(项目, "定义类型")
-    def define_property(自己, 项目):
-        return 自己.量值定义(项目, "定义属性")
-
-    def 结构定义(自己, 项目, 语义):
+    def define_quote(自己, 项目):
         return {
-            "语句": 语义,
+            "类型": "名称",
+            "名称": 项目[0]
+        }
+    def define_type(自己, 项目):
+        return 自己.定义语法(项目, "类型定义")
+    def define_constant(自己, 项目):
+        return 自己.定义语法(项目, "常量定义")
+    def define_variable(自己, 项目):
+        return 自己.定义语法(项目, "变量定义")
+    def define_capacity(自己, 项目):
+        return 自己.定义语法(项目, "容量定义")
+
+
+    def 结构语法(自己, 项目, 语句):
+        return {
+            "语句": 语句,
             "返回": 自己.提取数值(项目[0]),
             "名称": 自己.提取数值(项目[1]),
             "参数": 项目[2],
             "代码": 项目[3]
         }
-    def define_function(自己, 项目):
-        return 自己.结构定义(项目, "定义函数")
-    def define_structure(自己, 项目):
-        return 自己.结构定义(项目, "定义结构")
+    def struct_quote(自己, 项目):
+        return {
+            "语句": "调用结构",
+            "类型": "结构",
+            "名称": 项目[0],
+            "参数": 项目[1]
+        }
+    def struct_class(自己, 项目):
+        return 自己.结构语法(项目, "函数定义")
+    def struct_function(自己, 项目):
+        return 自己.结构语法(项目, "模型定义")
+
+
+    def control_loop(自己, 项目):
+        return {}
+    def control_selest(自己, 项目):
+        return {}
 
     def access_pipe(自己, 项目):
         return {
@@ -47,12 +67,8 @@ class 语法分析(Transformer):
             "属性": [自己.提取数值(项目[i]) for i in range(1, len(项目), 2)]
         }
 
-    def function(自己, 项目):
-        return {
-            "语句": "结构调用",
-            "名称": 自己.提取数值(项目[0]),
-            "参数": 自己.提取数值(项目[1])
-        }
+    def access_object(自己, 项目):
+        return {}
 
     def type(自己, 项目):
         return 项目[0] if 项目 else None
@@ -64,10 +80,18 @@ class 语法分析(Transformer):
         return 项目[0] if 项目 else None
     
     def string(自己, 项目):
+
         if (项目):
           数值 = 自己.提取数值(项目[0])
           数值 = 数值[1:-1]
           return {"类型":"文本","数值": 数值}
+        else:
+          return None
+
+    def number(自己, 项目):
+        if (项目):
+          数值 = 自己.提取数值(项目[0])
+          return {"类型":"数字","数值": 数值}
         else:
           return None
     
@@ -102,11 +126,11 @@ class 语法分析(Transformer):
             return [自身.提取数值(item) for item in 节点]
         return 节点
     
-    def 提取参数(self, node):
-        if isinstance(node, Tree) and node.data == 'param':
-            return [self.提取数值(child) for child in node.children if child]
-        elif isinstance(node, Tree) and node.data == 'arguments':
-            return [self.提取数值(child) for child in node.children if child]
+    def 提取参数(自己, 节点):
+        if isinstance(节点, Tree) and 节点.data == 'param':
+            return [self.提取数值(child) for child in 节点.children if child]
+        elif isinstance(节点, Tree) and 节点.data == 'arguments':
+            return [self.提取数值(child) for child in 节点.children if child]
         return []
 
 分析工具 = 语法分析()
