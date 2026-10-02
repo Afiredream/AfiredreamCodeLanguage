@@ -109,4 +109,5 @@ class 语法分析(Transformer):
 
 分析工具 = 语法分析()
 def 语言语法分析(词元列表):
+  print(分析工具.transform(词元列表))
   return 分析工具.transform(词元列表)
