@@ -359,10 +359,14 @@ class 语法分析(转换器):
         return 结果
 
     def param(自己, 项目):
-        return {
+        结果 = {
             "类型": str(项目[0]),
             "量值": str(项目[1]),
         }
+        # 有默认值时记下来，调用时少传的参数用它补齐
+        if len(项目) > 2:
+            结果["默认值"] = 项目[2]
+        return 结果
 
     def arguments(自己, 项目):
         return 项目
