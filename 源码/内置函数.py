@@ -229,7 +229,7 @@ import types
 # 只开放常用的纯计算函数，像 open、eval、exec、exit 这类不在此列。
 开放的Python内置 = frozenset({
     'abs', 'round', 'min', 'max', 'sum', 'pow', 'divmod',
-    'len', 'repr', 'ord', 'chr', 'format',
+    'len', 'repr', 'ord', 'chr', 'format', 'bin', 'oct', 'hex',
     'list', 'sorted', 'reversed', 'enumerate', 'zip', 'range',
     'any', 'all', 'map', 'filter',
     # 文件读写
@@ -239,7 +239,7 @@ import types
 
 # 这些是 Python 标准库模块，供模块代码直接使用，如 json.dumps(...)
 开放的标准库 = frozenset({'json', 'os', 're', 'html', 'posixpath',
-                            'configparser'})
+                            'configparser', 'math'})
 
 # 这些名字对应 Python 的类型，用于类型转换，如 int("12")、float("1.5")
 开放的Python类型 = frozenset({
