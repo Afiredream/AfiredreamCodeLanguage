@@ -13,7 +13,8 @@ def 文本长度(文本: str) -> int:
     return len(文本)
 
 def 文本索引(文本: str, 索引: int) -> str:
-    return 文本[索引+1]
+    # 本语言从 1 开始数，第 1 个字符即文本首位
+    return 文本[索引 - 1]
 
 def 文本拼接(*参数) -> str:
     return ''.join(map(str, 参数))
