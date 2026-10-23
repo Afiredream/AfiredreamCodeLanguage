@@ -74,10 +74,14 @@ class 语法分析(转换器):
         }
 
     def struct_quote(自己, 项目):
+        名称 = 项目[0]
+        # 成员调用（模块.函数 或 值.方法）保留结构，运行期再判断
+        if not isinstance(名称, dict):
+            名称 = str(名称)
         return {
             "语句": "调用结构",
             "类型": "结构",
-            "名称": str(项目[0]),
+            "名称": 名称,
             "参数": 项目[1],
         }
 
@@ -95,13 +99,17 @@ class 语法分析(转换器):
         }
 
     def control_select(自己, 项目):
-        return {
+        结果 = {
             "语句": "条件语句",
             "条件": 项目[0],
             "代码": 项目[1],
-            "或者条件": 项目[2],
-            "或者代码": 项目[3],
+            "或者条件": None,
+            "或者代码": [],
         }
+        if len(项目) > 3:
+            结果["或者条件"] = 项目[2]
+            结果["或者代码"] = 项目[3]
+        return 结果
 
     def access_pipe(自己, 项目):
         return {
@@ -111,6 +119,33 @@ class 语法分析(转换器):
         }
 
     # ── 表达式与新增语句 ────────────────────────────────────────
+
+    def arithmetic(自己, 项目):
+        return {
+            "类型": "运算",
+            "运算": str(项目[0]),
+            "左": 项目[1],
+            "右": 项目[2],
+        }
+
+    def 取反(自己, 项目):
+        return {"类型": "取反", "量值": 项目[0] if 项目 else None}
+
+    def logical(自己, 项目):
+        return {
+            "类型": "逻辑运算",
+            "运算": str(项目[0]),
+            "左": 项目[1],
+            "右": 项目[2],
+        }
+
+    def membership(自己, 项目):
+        return {
+            "类型": "成员运算",
+            "运算": str(项目[0]),
+            "左": 项目[1],
+            "右": 项目[2],
+        }
 
     def compare(自己, 项目):
         return {
@@ -126,9 +161,45 @@ class 语法分析(转换器):
             "量值": 项目[0],
         }
 
+    def list(自己, 项目):
+        # 列表字面量：[值, 值, ...]
+        return {"类型": "列表", "量值": 项目}
+
+    def object(自己, 项目):
+        return {"类型": "对象", "量值": 项目}
+
+    def pair(自己, 项目):
+        return {"键": 项目[0], "量值": 项目[1]}
+
+    def key(自己, 项目):
+        return 项目[0] if 项目 else None
+
+    def integer(自己, 项目):
+        return 项目[0] if 项目 else None
+
+    def natural(自己, 项目):
+        return 项目[0] if 项目 else None
+
     def data(自己, 项目):
         # data 只包一层，取其内部结果
         return 项目[0] if 项目 else None
+
+    def member_assign(自己, 项目):
+        return {
+            "语句": "成员赋值",
+            "对象": str(项目[0]),
+            "成员": str(项目[1]),
+            "量值": 项目[2],
+        }
+
+    def subscript_assign(自己, 项目):
+        # 形如 名称[键1][键2] = 值
+        return {
+            "语句": "下标赋值",
+            "名称": str(项目[0]),
+            "键列表": 项目[1:-1],
+            "量值": 项目[-1],
+        }
 
     def assign(自己, 项目):
         return {
@@ -157,11 +228,40 @@ class 语法分析(转换器):
     def access_object(自己, 项目):
         return {}
 
+    def module_path(自己, 项目):
+        # 模块路径的各片段拼接起来，如 工具 / 数学
+        路径 = ''.join(str(项) for 项 in 项目)
+        # 用引号写成的路径要去掉引号，如 "./工具/数学"
+        if len(路径) >= 2 and 路径[0] in ('"', "'") and 路径[-1] == 路径[0]:
+            路径 = 路径[1:-1]
+        return 路径
+
+    def select(自己, 项目):
+        # 只取名字，过滤掉其它内容
+        return [str(项) for 项 in 项目 if isinstance(项, str)]
+
     def module_import(自己, 项目):
-        return {}
+        # 项目[0] = 模块路径，项目[1] = 选择列表，项目[2] = 别名
+        别名 = 项目[2] if len(项目) > 2 and 项目[2] else None
+        return {
+            "语句": "导入模块",
+            "模块": 项目[0],
+            "选择": 项目[1],
+            "别名": str(别名) if 别名 else None,
+        }
 
     def module_export(自己, 项目):
-        return {}
+        return {
+            "语句": "选择导出",
+            "选择": 项目[0],
+        }
+
+    def export_function(自己, 项目):
+        # 导出 add(a, b) { ... }：先当作函数定义，再登记到导出表
+        return {
+            "语句": "导出函数",
+            "函数": 项目[0],
+        }
 
     def type(自己, 项目):
         # 参数省略类型时，类型节点为空
@@ -169,6 +269,37 @@ class 语法分析(转换器):
 
     def name(自己, 项目):
         return 项目[0]
+
+    def subscript(自己, 项目):
+        return {
+            "类型": "下标",
+            "对象": 项目[0],
+            "位置": 项目[1] if len(项目) > 1 else None,
+        }
+
+    def slice_start(自己, 项目):
+        return ("起", 项目[0])
+
+    def slice_end(自己, 项目):
+        return ("止", 项目[0])
+
+    def slice(自己, 项目):
+        结果 = {"类型": "切片", "对象": 项目[0], "起点": None, "终点": None}
+        for 项 in 项目[1:]:
+            if isinstance(项, tuple) and len(项) == 2:
+                if 项[0] == "起":
+                    结果["起点"] = 项[1]
+                else:
+                    结果["终点"] = 项[1]
+        return 结果
+
+    def member(自己, 项目):
+        # 成员访问，如 数.add、文本.upper、" ".join
+        # 左边可能是模块别名、变量名，也可能是字面量，运行期再判断
+        对象 = 项目[0]
+        if not isinstance(对象, dict):
+            对象 = str(对象)
+        return {"类型": "成员", "对象": 对象, "成员": str(项目[1])}
 
     def value(自己, 项目):
         return 项目[0]
@@ -197,6 +328,10 @@ class 语法分析(转换器):
 
     def arguments(自己, 项目):
         return 项目
+
+    def keyword(自己, 项目):
+        # 关键字参数，如 encoding="utf-8"
+        return {"关键字": str(项目[0]), "量值": 项目[1]}
 
     def argument(自己, 项目):
         return 项目[0]
