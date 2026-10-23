@@ -38,6 +38,45 @@ def 算术(运算, 左, 右):
     return None
 
 
+# 类型名 → 判断函数。用于检查实参与形参的类型标注是否相符。
+类型判断 = {
+    "文本": lambda 值: isinstance(值, str),
+    "数字": lambda 值: isinstance(值, (int, float)) and not isinstance(值, bool),
+    "状态": lambda 值: isinstance(值, bool),
+    "大小": lambda 值: isinstance(值, (int, float)) and not isinstance(值, bool),
+    "列表": lambda 值: isinstance(值, (list, tuple)),
+    "数组": lambda 值: isinstance(值, (list, tuple)),
+    "对象": lambda 值: isinstance(值, dict),
+    "空白": lambda 值: True,      # 不限制
+    "任意": lambda 值: True,      # 不限制
+}
+
+
+def 类型相符(类型名, 值):
+    """判断值是否符合类型标注；未知类型名一律放行。"""
+    if not 类型名:
+        return True
+    判断 = 类型判断.get(str(类型名))
+    if 判断 is None:
+        return True
+    return 判断(值)
+
+
+def 值类型名(值):
+    """给出值的大致类型名，用于错误提示。"""
+    if isinstance(值, bool):
+        return "状态"
+    if isinstance(值, (int, float)):
+        return "数字"
+    if isinstance(值, str):
+        return "文本"
+    if isinstance(值, (list, tuple)):
+        return "列表"
+    if isinstance(值, dict):
+        return "对象"
+    return type(值).__name__
+
+
 # 全局常量：名字 → 值。这些名字不允许被重新定义或赋值。
 全局常量 = {
     "操作系统": None,   # 运行时填入实际系统名
@@ -267,10 +306,12 @@ class 代码解释:
 
     def 解释条件语句(自己, 语法单元):
         if 自己.求条件(语法单元.get("条件")):
-            语句列表 = 语法单元.get("代码") or []
-        else:
-            语句列表 = 语法单元.get("或者代码") or []
-        return 自己.解释列表(语句列表)
+            return 自己.解释列表(语法单元.get("代码") or [])
+        # 「或者」分支有自己的条件，需要再判断一次
+        或者条件 = 语法单元.get("或者条件")
+        if 或者条件 is not None and 自己.求条件(或者条件):
+            return 自己.解释列表(语法单元.get("或者代码") or [])
+        return None
 
     def 解释返回语句(自己, 语法单元):
         自己.函数返回 = 自己.解析参数单元(语法单元.get("量值"))
@@ -346,11 +387,35 @@ class 代码解释:
         # 只在当前作用域里放形参，外层变量通过父作用域查找
         变量列表 = {}
         形参列表 = 结构对象.get("参数") or []
-        for 形参, 实参 in zip(形参列表, 参数列表):
+
+        # 参数收集：名称... 把剩余的实参全部收进一个列表
+        收集名 = None
+        收集类型 = None
+        if 形参列表 and isinstance(形参列表[-1], dict) \
+                and 形参列表[-1].get("类型") == "收集":
+            收集项 = 形参列表[-1]
+            收集名 = 收集项.get("量值")
+            收集类型 = 收集项.get("元素类型")
+            形参列表 = 形参列表[:-1]
+
+        for 序号, (形参, 实参) in enumerate(zip(形参列表, 参数列表), 1):
+            类型名 = 形参.get("类型")
+            if not 类型相符(类型名, 实参):
+                print(f"「{结构名称}」第 {序号} 个参数「{形参.get('量值')}」"
+                      f"需要{类型名}，却收到{值类型名(实参)}")
             变量列表[形参.get("量值")] = 实参
-        # 少传的参数当作空文本，避免后续拼接出现 None
-        for 形参 in 形参列表[len(参数列表):]:
-            变量列表.setdefault(形参.get("量值"), "")
+        if 收集名 is not None:
+            剩余 = list(参数列表[len(形参列表):])
+            # 逐个检查收集到的实参是否符合元素类型
+            for 序号, 项 in enumerate(剩余, len(形参列表) + 1):
+                if not 类型相符(收集类型, 项):
+                    print(f"「{结构名称}」第 {序号} 个参数需要{收集类型}，"
+                          f"却收到{值类型名(项)}")
+            变量列表[收集名] = 剩余
+        else:
+            # 少传的参数当作空文本，避免后续拼接出现 None
+            for 形参 in 形参列表[len(参数列表):]:
+                变量列表.setdefault(形参.get("量值"), "")
         子解释器 = 代码解释(变量列表)
         子解释器.父作用域 = 自己
         # 优先使用函数定义时所在的模块环境
@@ -496,7 +561,7 @@ class 代码解释:
                     return True
                 if 名称 in ("假", "False"):
                     return False
-                if 名称 in ("None", "空"):
+                if 名称 == "None":
                     return None
                 # Python 类型名与内置函数可直接作为值，如 optionxform = str
                 if 名称 in 自己.变量列表 or 自己.逐层查找(名称) is not None:
@@ -526,7 +591,7 @@ class 代码解释:
                     return True
                 if 名称 in ("假", "False"):
                     return False
-                if 名称 in ("None", "空"):
+                if 名称 == "None":
                     return None
                 # Python 类型名与内置函数可直接作为值，如 optionxform = str
                 if 名称 in 自己.变量列表 or 自己.逐层查找(名称) is not None:

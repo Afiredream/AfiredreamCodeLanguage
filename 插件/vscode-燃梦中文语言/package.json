@@ -1,0 +1,51 @@
+{
+  "name": "ranmeng-chinese-language",
+  "displayName": "燃梦中文语言",
+  "description": "燃梦中文语言（象语言）的语法高亮与语言配置",
+  "version": "0.1.0",
+  "publisher": "afiredream",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.60.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "keywords": [
+    "中文",
+    "中文编程",
+    "燃梦",
+    "象语言"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "ranmeng",
+        "aliases": [
+          "燃梦中文语言",
+          "燃梦",
+          "ranmeng"
+        ],
+        "extensions": [
+          ".象",
+          ".燃梦"
+        ],
+        "filenames": [
+          "测试文件"
+        ],
+        "configuration": "./language-configuration/language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "ranmeng",
+        "scopeName": "source.ranmeng",
+        "path": "./syntaxes/ranmeng.tmLanguage.json"
+      }
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Afiredream/ChineseCodeLanguage"
+  }
+}

@@ -320,6 +320,14 @@ class 语法分析(转换器):
     def params(自己, 项目):
         return 项目
 
+    def varargs(自己, 项目):
+        # 参数收集：名称... ；写了类型时记录为元素类型
+        结果 = {"类型": "收集", "量值": str(项目[0]) if 项目 else "",
+                "元素类型": None}
+        if len(项目) > 1 and 项目[1]:
+            结果["元素类型"] = str(项目[1])
+        return 结果
+
     def param(自己, 项目):
         return {
             "类型": str(项目[0]),

@@ -1,0 +1,168 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "燃梦中文语言",
+  "scopeName": "source.ranmeng",
+
+  "patterns": [
+    { "include": "#注释" },
+    { "include": "#文本" },
+    { "include": "#数字" },
+    { "include": "#定义语句" },
+    { "include": "#结构定义" },
+    { "include": "#控制语句" },
+    { "include": "#导入导出" },
+    { "include": "#返回语句" },
+    { "include": "#运算符" },
+    { "include": "#状态字面量" },
+    { "include": "#函数调用" },
+    { "include": "#本地函数名" },
+    { "include": "#标点" }
+  ],
+
+  "repository": {
+
+    "注释": {
+      "match": "#.*$",
+      "name": "comment.line.number-sign.ranmeng"
+    },
+
+    "文本": {
+      "patterns": [
+        {
+          "begin": "\"",
+          "end": "\"",
+          "name": "string.quoted.double.ranmeng",
+          "patterns": []
+        },
+        {
+          "begin": "'",
+          "end": "'",
+          "name": "string.quoted.single.ranmeng",
+          "patterns": []
+        }
+      ]
+    },
+
+    "数字": {
+      "match": "(?<![\\w\\u4e00-\\u9fff])-?\\d+(\\.\\d+)?",
+      "name": "constant.numeric.ranmeng"
+    },
+
+    "状态字面量": {
+      "match": "(?<![\\w\\u4e00-\\u9fff])(真|假|True|False|None)(?![\\w\\u4e00-\\u9fff])",
+      "name": "constant.language.boolean.ranmeng"
+    },
+
+    "定义语句": {
+      "match": "^\\s*(类型|常量|变量|容量)\\s+([\\w\\u3400-\\u4dbf\\u4e00-\\u9fff]+)\\s*:\\s*([\\w\\u3400-\\u4dbf\\u4e00-\\u9fff]+)",
+      "captures": {
+        "1": { "name": "storage.type.ranmeng" },
+        "2": { "name": "entity.name.type.ranmeng" },
+        "3": { "name": "variable.other.ranmeng" }
+      }
+    },
+
+    "结构定义": {
+      "match": "^\\s*(函数|模型|导出)\\s+(?:([\\w\\u3400-\\u4dbf\\u4e00-\\u9fff]+)\\s*:\\s*)?([\\w\\u3400-\\u4dbf\\u4e00-\\u9fff]+)\\s*\\(",
+      "captures": {
+        "1": { "name": "storage.type.function.ranmeng" },
+        "2": { "name": "entity.name.type.ranmeng" },
+        "3": { "name": "entity.name.function.ranmeng" }
+      }
+    },
+
+    "参数列表": {
+      "patterns": [
+        {
+          "match": "([\\w\\u3400-\\u4dbf\\u4e00-\\u9fff]+)\\s*:\\s*([\\w\\u3400-\\u4dbf\\u4e00-\\u9fff]+)",
+          "captures": {
+            "1": { "name": "entity.name.type.ranmeng" },
+            "2": { "name": "variable.parameter.ranmeng" }
+          }
+        },
+        {
+          "match": "([\\w\\u3400-\\u4dbf\\u4e00-\\u9fff]+)\\s*(\\.\\.\\.)",
+          "captures": {
+            "1": { "name": "variable.parameter.ranmeng" },
+            "2": { "name": "keyword.operator.ranmeng" }
+          }
+        }
+      ]
+    },
+
+    "控制语句": {
+      "patterns": [
+        {
+          "match": "\\b(如果|或者|否则|循环|执行)\\b",
+          "name": "keyword.control.ranmeng"
+        }
+      ]
+    },
+
+    "导入导出": {
+      "patterns": [
+        {
+          "match": "\\b(导入|导出)\\b",
+          "name": "keyword.control.import.ranmeng"
+        },
+        {
+          "match": "\\b(命名|选择)\\b",
+          "name": "keyword.other.import-modifier.ranmeng"
+        }
+      ]
+    },
+
+    "返回语句": {
+      "match": "\\b返回\\b",
+      "name": "keyword.control.flow.ranmeng"
+    },
+
+    "运算符": {
+      "patterns": [
+        {
+          "match": "\\.\\.\\.",
+          "name": "keyword.operator.spread.ranmeng"
+        },
+        {
+          "match": "(<=|>=|==|!=|&&|\\|\\||\\+\\+|--|\\+=|-=|not\\b|and\\b|or\\b|in\\b)",
+          "name": "keyword.operator.ranmeng"
+        },
+        {
+          "match": "[+\\-*/%<>=!&|^~?]",
+          "name": "keyword.operator.ranmeng"
+        }
+      ]
+    },
+
+    "函数调用": {
+      "patterns": [
+        {
+          "match": "([\\w\\u3400-\\u4dbf\\u4e00-\\u9fff]+)\\s*(\\()",
+          "captures": {
+            "1": { "name": "support.function.ranmeng" },
+            "2": { "name": "punctuation.section.parens.begin.ranmeng" }
+          }
+        }
+      ]
+    },
+
+    "本地函数名": {
+      "match": "\\b(终端输出|终端输入|文本长度|文本索引|文本拼接|修剪空白|正则查找)\\b",
+      "name": "support.function.builtin.ranmeng"
+    },
+
+    "标点": {
+      "patterns": [
+        { "match": "\\(", "name": "punctuation.section.parens.begin.ranmeng" },
+        { "match": "\\)", "name": "punctuation.section.parens.end.ranmeng" },
+        { "match": "\\[", "name": "punctuation.section.brackets.begin.ranmeng" },
+        { "match": "\\]", "name": "punctuation.section.brackets.end.ranmeng" },
+        { "match": "\\{", "name": "punctuation.section.braces.begin.ranmeng" },
+        { "match": "\\}", "name": "punctuation.section.braces.end.ranmeng" },
+        { "match": ",", "name": "punctuation.separator.comma.ranmeng" },
+        { "match": "[:=]", "name": "punctuation.separator.key-value.ranmeng" },
+        { "match": "\\.", "name": "punctuation.accessor.ranmeng" }
+      ]
+    }
+  }
+}
