@@ -94,6 +94,16 @@ class 语法分析(转换器):
     def struct_define(自己, 项目):
         return 自己.struct(项目, "结构定义")
 
+    def for_statement(自己, 项目):
+        # 对于 (列表, 索引, 元素) { 语句 }
+        return {
+            "语句": "对于语句",
+            "列表": 项目[0],
+            "索引": str(项目[1]),
+            "元素": str(项目[2]),
+            "代码": 项目[3],
+        }
+
     def control_loop(自己, 项目):
         return {
             "语句": "循环语句",
