@@ -91,6 +91,9 @@ class 语法分析(转换器):
     def struct_function(自己, 项目):
         return 自己.struct(项目, "函数结构")
 
+    def struct_define(自己, 项目):
+        return 自己.struct(项目, "结构定义")
+
     def control_loop(自己, 项目):
         return {
             "语句": "循环语句",
@@ -105,10 +108,15 @@ class 语法分析(转换器):
             "代码": 项目[1],
             "或者条件": None,
             "或者代码": [],
+            "否则条件": None,
+            "否则代码": [],
         }
         if len(项目) > 3:
             结果["或者条件"] = 项目[2]
             结果["或者代码"] = 项目[3]
+        if len(项目) > 5:
+            结果["否则条件"] = 项目[4]
+            结果["否则代码"] = 项目[5]
         return 结果
 
     def access_pipe(自己, 项目):
@@ -290,7 +298,12 @@ class 语法分析(转换器):
         return 项目[0] if 项目 else ""
 
     def name(自己, 项目):
-        return 项目[0]
+        # 无名函数（结构里的入口）没有名称
+        return 项目[0] if 项目 else ""
+
+    def 恒真(自己, 项目):
+        # 「否则」分支的条件恒成立，直接给出真值
+        return True
 
     def subscript(自己, 项目):
         return {
